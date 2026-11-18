@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Daily Task Tracker — Modern productivity app with time-blocking, Pomodoro focus timer, subtasks, and productivity analytics.">
-  <title>Daily Task Tracker | Focus & Productivity Suite</title>
+  <meta name="description" content="Tracko — Daily productivity suite with time-blocking schedule, running calculator, Pomodoro focus timer, and streaks.">
+  <title>Tracko | Smart Daily Planner & Run Suite</title>
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -25,13 +25,10 @@
     <header class="app-header">
       <div class="header-left">
         <div class="logo-mark">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <path d="M9 11l3 3L22 4"/>
-            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
-          </svg>
+          <span class="logo-letter">T</span>
         </div>
         <div class="brand-info">
-          <h1>Daily<span>Tracker</span></h1>
+          <h1>Track<span>o</span></h1>
           <p id="currentDateDisplay" class="date-subtitle">Loading date...</p>
         </div>
       </div>
@@ -87,15 +84,15 @@
       <div class="summary-stats-group">
         <div class="summary-stat-pill">
           <span class="stat-number" id="totalTasksCount">0</span>
-          <span class="stat-label">Total Scheduled</span>
+          <span class="stat-label">Total Tasks</span>
         </div>
         <div class="summary-stat-pill">
           <span class="stat-number text-accent" id="activeTasksCount">0</span>
-          <span class="stat-label">In Progress</span>
+          <span class="stat-label">Pending</span>
         </div>
         <div class="summary-stat-pill">
           <span class="stat-number text-success" id="completedTasksCount">0</span>
-          <span class="stat-label">Done & Checked</span>
+          <span class="stat-label">Completed</span>
         </div>
         <div class="summary-stat-pill">
           <span class="stat-number text-warning" id="highPriorityCount">0</span>
@@ -106,33 +103,60 @@
 
     <!-- VIEW TABS NAVIGATION -->
     <nav class="view-tabs">
-      <button class="tab-btn active" data-tab="list">
+      <button class="tab-btn active" data-tab="timeline">
+        <span class="tab-icon">📅</span>
+        <span>Schedule Planner (6 AM+)</span>
+      </button>
+      <button class="tab-btn" data-tab="list">
         <span class="tab-icon">📋</span>
         <span>Daily Tasks</span>
+      </button>
+      <button class="tab-btn" data-tab="running">
+        <span class="tab-icon">🏃</span>
+        <span>Running Hub & Calc</span>
       </button>
       <button class="tab-btn" data-tab="pomodoro">
         <span class="tab-icon">⏱️</span>
         <span>Pomodoro Focus</span>
       </button>
-      <button class="tab-btn" data-tab="timeline">
-        <span class="tab-icon">📅</span>
-        <span>Schedule Planner</span>
-      </button>
       <button class="tab-btn" data-tab="analytics">
         <span class="tab-icon">📊</span>
-        <span>Productivity Stats</span>
+        <span>Analytics</span>
       </button>
     </nav>
 
-    <!-- TAB 1: DAILY TASK LIST VIEW -->
-    <main class="tab-content active" id="tab-list">
+    <!-- ========================================================
+         TAB 1: HOURLY SCHEDULE PLANNER (DIRECT INLINE WRITING FROM 6 AM)
+         ======================================================== -->
+    <main class="tab-content active" id="tab-timeline">
+      <div class="schedule-planner-container">
+        <div class="timeline-header">
+          <div class="timeline-header-text">
+            <h3>Daily Hourly Schedule Planner (Starting 6:00 AM)</h3>
+            <p>Directly type activities into any hour slot below. Your day begins at 6:00 AM!</p>
+          </div>
+          <div class="timeline-quick-tip">
+            <span>💡 Pro-tip: Type in any slot and press <kbd>Enter</kbd> to add directly.</span>
+          </div>
+        </div>
+        
+        <div class="hourly-grid" id="hourlyTimeline">
+          <!-- Populated dynamically (6:00 AM to 10:00 PM) with direct write inputs -->
+        </div>
+      </div>
+    </main>
+
+    <!-- ========================================================
+         TAB 2: DAILY TASK LIST VIEW
+         ======================================================== -->
+    <section class="tab-content" id="tab-list">
       
       <!-- QUICK ADD BAR -->
       <div class="quick-add-box">
         <form id="quickAddForm" class="quick-add-form">
           <div class="input-main-row">
             <span class="plus-icon">＋</span>
-            <input type="text" id="taskInputText" placeholder="Add a new task for today (e.g. 'Review pull request', 'Study JavaScript', 'Workout')..." autocomplete="off" required>
+            <input type="text" id="taskInputText" placeholder="Add a new task for today (e.g. 'Morning 5km run', 'Code review', 'Workout')..." autocomplete="off" required>
             <button type="submit" class="btn btn-primary add-submit-btn">
               <span>Add Task</span>
               <kbd class="kbd-hint">Enter</kbd>
@@ -146,9 +170,10 @@
               <select id="taskCategorySelect">
                 <option value="Work">💼 Work</option>
                 <option value="Code">💻 Coding</option>
+                <option value="Running">🏃 Running & Cardio</option>
+                <option value="Health">💪 Fitness & Health</option>
                 <option value="Study">📚 Study</option>
                 <option value="Personal">🏠 Personal</option>
-                <option value="Health">💪 Health</option>
               </select>
             </div>
 
@@ -175,10 +200,10 @@
               </select>
             </div>
 
-            <!-- Due Time -->
+            <!-- Due Time (Starts from 06:00 AM) -->
             <div class="option-select-wrap">
               <span class="option-icon">⏰</span>
-              <input type="time" id="taskDueTimeInput" value="12:00">
+              <input type="time" id="taskDueTimeInput" value="06:00">
             </div>
           </div>
         </form>
@@ -203,9 +228,10 @@
             <option value="all">All Categories</option>
             <option value="Work">💼 Work</option>
             <option value="Code">💻 Coding</option>
+            <option value="Running">🏃 Running & Cardio</option>
+            <option value="Health">💪 Fitness</option>
             <option value="Study">📚 Study</option>
             <option value="Personal">🏠 Personal</option>
-            <option value="Health">💪 Health</option>
           </select>
         </div>
       </div>
@@ -219,12 +245,163 @@
       <div class="empty-state" id="emptyState" style="display: none;">
         <div class="empty-icon">🎯</div>
         <h3>No tasks found for today</h3>
-        <p>Type a task in the box above to schedule your day and build your streak!</p>
+        <p>Type a task in the box above or write directly in the Schedule Planner!</p>
       </div>
 
-    </main>
+    </section>
 
-    <!-- TAB 2: POMODORO FOCUS STATION -->
+    <!-- ========================================================
+         TAB 3: RUNNING HUB & CALCULATOR (DEDICATED RUNNING SUITE)
+         ======================================================== -->
+    <section class="tab-content" id="tab-running">
+      <div class="running-hub-container">
+        
+        <!-- RUNNING HEADER BANNER -->
+        <div class="running-header-card">
+          <div class="running-header-left">
+            <span class="run-badge">🏃 RUNNING SUITE</span>
+            <h2>Tracko Run Hub & Fitness Calculator</h2>
+            <p>Calculate exact running requirements, target distance, pace, calories burned, and log daily cardio sessions.</p>
+          </div>
+          <div class="running-weekly-metric">
+            <div class="metric-val"><span id="runWeeklyTotalKm">12.5</span> <small>KM</small></div>
+            <div class="metric-label">Completed This Week</div>
+          </div>
+        </div>
+
+        <!-- RUNNING GRID (CALCULATOR + GOAL PLANNER) -->
+        <div class="running-grid">
+          
+          <!-- CARD 1: RUNNING REQUIREMENT & CALORIES CALCULATOR -->
+          <div class="run-card">
+            <div class="run-card-header">
+              <h3>⚡ Running & Calories Calculator</h3>
+              <span class="sub-label">Instant Energy & Pace Math</span>
+            </div>
+
+            <div class="calc-inputs-grid">
+              <div class="form-group">
+                <label>Distance to Run (km)</label>
+                <input type="number" id="calcDistanceInput" value="5" min="0.5" max="100" step="0.5">
+              </div>
+
+              <div class="form-group">
+                <label>Target Time (Minutes)</label>
+                <input type="number" id="calcTimeInput" value="30" min="1" max="600">
+              </div>
+
+              <div class="form-group">
+                <label>Body Weight (kg)</label>
+                <input type="number" id="calcWeightInput" value="70" min="30" max="250">
+              </div>
+
+              <div class="form-group">
+                <label>Running Surface / Terrain</label>
+                <select id="calcTerrainSelect">
+                  <option value="1.0">Road / Pavement (Flat)</option>
+                  <option value="1.08">Trail / Off-road (+8% effort)</option>
+                  <option value="0.95">Treadmill (Smooth)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Live Calculation Results -->
+            <div class="calc-results-box">
+              <div class="calc-result-pill">
+                <span class="res-label">Pace</span>
+                <span class="res-val" id="calcResultPace">6:00 min/km</span>
+              </div>
+              <div class="calc-result-pill">
+                <span class="res-label">Average Speed</span>
+                <span class="res-val" id="calcResultSpeed">10.0 km/h</span>
+              </div>
+              <div class="calc-result-pill">
+                <span class="res-label">Calories Burned</span>
+                <span class="res-val text-warning" id="calcResultCalories">~362 kcal</span>
+              </div>
+              <div class="calc-result-pill">
+                <span class="res-label">Recommended Hydration</span>
+                <span class="res-val" id="calcResultHydration">350 ml</span>
+              </div>
+            </div>
+
+            <button id="addRunToScheduleBtn" class="btn btn-primary btn-full" style="margin-top:16px;">
+              <span>📅 Schedule This Run at 6:00 AM Today</span>
+            </button>
+          </div>
+
+          <!-- CARD 2: "HOW MUCH RUNNING DO I NEED?" GOAL ADVISOR -->
+          <div class="run-card">
+            <div class="run-card-header">
+              <h3>🎯 "How Much Running Do I Need?"</h3>
+              <span class="sub-label">Goal-Based Distance Advisor</span>
+            </div>
+
+            <div class="goal-advisor-content">
+              <div class="form-group">
+                <label>What is your primary fitness goal?</label>
+                <select id="goalPresetSelect" class="clean-select" style="width:100%;padding:10px;">
+                  <option value="fatloss">🔥 Fat Loss / Calorie Burn (Burn 500 kcal)</option>
+                  <option value="endurance">🫀 Cardiovascular Health (General Fitness)</option>
+                  <option value="5k">🏁 First 5K Finisher (Consistency)</option>
+                  <option value="10k">⚡ Speed & 10K Training (Intermediate)</option>
+                  <option value="stress">🌿 Mental Clarity & Stress Relief (Light Jog)</option>
+                </select>
+              </div>
+
+              <!-- Recommendation Result Box -->
+              <div class="goal-recommendation-box" id="goalRecommendationBox">
+                <div class="rec-title" id="recTitle">Fat Loss Goal (Burn ~500 kcal)</div>
+                <div class="rec-metrics">
+                  <div class="rec-pill">
+                    <span class="rec-label">Target Distance</span>
+                    <strong class="rec-val" id="recDistance">6.8 km</strong>
+                  </div>
+                  <div class="rec-pill">
+                    <span class="rec-label">Target Duration</span>
+                    <strong class="rec-val" id="recDuration">~40-45 mins</strong>
+                  </div>
+                  <div class="rec-pill">
+                    <span class="rec-label">Frequency</span>
+                    <strong class="rec-val" id="recFrequency">3-4 days / week</strong>
+                  </div>
+                </div>
+                <p class="rec-advice" id="recAdvice">
+                  Running at a conversational aerobic pace (Zone 2) maximizes fat oxidation while preserving muscle recovery.
+                </p>
+              </div>
+
+              <!-- Quick Log Form -->
+              <div class="quick-run-log-form">
+                <h4 style="font-size:0.92rem;margin-bottom:8px;">Quick Log Completed Run:</h4>
+                <div style="display:flex;gap:10px;">
+                  <input type="number" id="quickLogKm" placeholder="Distance (km)" value="5" step="0.5" style="flex:1;">
+                  <input type="number" id="quickLogMins" placeholder="Time (mins)" value="30" style="flex:1;">
+                  <button id="logRunBtn" class="btn btn-primary btn-sm">Log Run</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RECENT RUN ACTIVITY LOG -->
+        <div class="run-card" style="margin-top:20px;">
+          <div class="run-card-header">
+            <h3>🏃 Running Activity Log & History</h3>
+            <span class="sub-label">Logged Cardio Sessions</span>
+          </div>
+          <div class="run-history-list" id="runHistoryList">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================
+         TAB 4: POMODORO FOCUS STATION
+         ======================================================== -->
     <section class="tab-content" id="tab-pomodoro">
       <div class="pomodoro-container">
         <div class="pomodoro-card">
@@ -263,26 +440,14 @@
       </div>
     </section>
 
-    <!-- TAB 3: HOURLY SCHEDULE PLANNER -->
-    <section class="tab-content" id="tab-timeline">
-      <div class="schedule-planner-container">
-        <div class="timeline-header">
-          <h3>Daily Hourly Time-Block Schedule</h3>
-          <p>Organize your day hour-by-hour to balance deep work, meetings, and recovery.</p>
-        </div>
-        
-        <div class="hourly-grid" id="hourlyTimeline">
-          <!-- Populated dynamically (8:00 AM to 9:00 PM) -->
-        </div>
-      </div>
-    </section>
-
-    <!-- TAB 4: PRODUCTIVITY ANALYTICS -->
+    <!-- ========================================================
+         TAB 5: PRODUCTIVITY ANALYTICS
+         ======================================================== -->
     <section class="tab-content" id="tab-analytics">
       <div class="analytics-container">
         <div class="analytics-header">
           <h3>Weekly Productivity & Momentum Analysis</h3>
-          <p>Review your execution trends, category allocation, and consistency score.</p>
+          <p>Review your execution trends, category allocation, and consistency score in Tracko.</p>
         </div>
 
         <div class="analytics-grid">
@@ -307,7 +472,7 @@
 
           <!-- Productivity Insights Card -->
           <div class="analytics-card full-width">
-            <h4>Productivity Health Score</h4>
+            <h4>Tracko Efficiency Score</h4>
             <div class="insight-row">
               <div class="insight-badge" id="insightScoreBadge">A+</div>
               <div>
@@ -323,7 +488,7 @@
     <!-- FOOTER -->
     <footer class="app-footer">
       <div class="footer-left">
-        <span>© 2026 Daily Task Tracker • Crafted by <strong>Avinash Naik</strong></span>
+        <span>© 2026 <strong>Tracko</strong> • Crafted by <strong>Avinash Naik</strong></span>
       </div>
       <div class="footer-right">
         <button id="clearCompletedBtn" class="footer-btn">Clear Completed</button>
@@ -358,9 +523,10 @@
               <select id="editTaskCategory">
                 <option value="Work">💼 Work</option>
                 <option value="Code">💻 Coding</option>
+                <option value="Running">🏃 Running & Cardio</option>
+                <option value="Health">💪 Fitness</option>
                 <option value="Study">📚 Study</option>
                 <option value="Personal">🏠 Personal</option>
-                <option value="Health">💪 Health</option>
               </select>
             </div>
 
@@ -419,13 +585,13 @@
       </div>
       <div class="modal-body">
         <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:16px;">
-          All your daily tasks and streak data are stored locally in your browser. You can export a JSON backup to transfer between devices.
+          All your daily tasks, schedule blocks, and running logs in Tracko are stored locally in your browser. You can export a JSON backup to transfer between devices.
         </p>
 
         <div class="backup-actions-grid">
           <div class="backup-card">
             <h4>Export Data</h4>
-            <p>Download your complete task history and streaks as a portable JSON file.</p>
+            <p>Download your complete task history and runs as a portable JSON file.</p>
             <button id="exportJsonBtn" class="btn btn-outline btn-full">📥 Export JSON Backup</button>
           </div>
 

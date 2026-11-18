@@ -1,42 +1,38 @@
-# 📌 Daily Task Tracker — Focus & Productivity Suite
+# ⚡ Tracko — Smart Daily Planner & Run Suite
 
-A modern, high-performance daily productivity and task-tracking web application engineered by **Avinash Naik** (`@naikavinash1908-ctrl`).
+A modern, high-performance daily productivity, time-blocking, and cardio-tracking web application engineered by **Avinash Naik** (`@naikavinash1908-ctrl`).
 
-Designed to streamline task execution with **Time-Blocking**, integrated **Pomodoro Focus Timer**, **Daily Streaks**, and real-time **Productivity Analytics**.
+Designed to streamline daily execution with **Direct-Write Hourly Time-Blocking (starting at 6:00 AM)**, an integrated **Running & Fitness Calculator Hub**, a **Pomodoro Focus Station**, and **Productivity Analytics**.
 
 ---
 
-## 🌟 Key Features
+## 🌟 Key Features in Tracko
 
-1. **Daily Task Management & Prioritization**:
-   - Quick-add with **Priority Badges** (`P1 • High`, `P2 • Medium`, `P3 • Low`).
-   - Category tags: `💼 Work`, `💻 Coding`, `📚 Study`, `💪 Health`, and `🏠 Personal`.
-   - Estimated durations & scheduled due times.
-   - Smooth check transitions with completion sound chimes.
+1. **📅 Direct-Write Daily Schedule Planner (Starts at 6:00 AM)**:
+   - Full hourly time-block layout from **6:00 AM to 10:00 PM**.
+   - **Direct Inline Writing**: Click or type right inside any hour slot and press <kbd>Enter</kbd> to instantly schedule your activity.
+   - Quick checkmark toggle and removal directly on the schedule cards.
 
-2. **⏱️ Integrated Pomodoro Focus Station**:
+2. **🏃 Running Hub & Cardio Calculator Suite**:
+   - **Instant Run Math**: Calculates speed ($km/h$), pace ($min/km$), total calories burned, and recommended hydration based on distance, duration, body weight, and terrain.
+   - **"How Much Running Do I Need?" Advisor**: Goal-driven targets for Fat Loss (burn 500 kcal), 5K Preparation, 10K Training, Cardiovascular Endurance, and Stress Relief.
+   - **One-Click Scheduling**: Automatically schedule your morning run at **6:00 AM** with one click.
+   - **Run Activity Log**: Track running sessions, weekly mileage progress, and running streaks.
+
+3. **⏱️ Integrated Pomodoro Focus Station**:
    - 25-minute Deep Work, 5-minute Short Break, and 15-minute Long Break intervals.
-   - Link any active task directly from your list to the Pomodoro timer.
+   - Link any active task directly from your list or schedule to the Pomodoro timer.
    - Web Audio API notification bells when cycles finish.
 
-3. **📅 Hourly Schedule Planner (Time-Blocking)**:
-   - Visual time-block grid from **8:00 AM to 8:00 PM**.
-   - Automatically maps your daily tasks to their scheduled hour slots for balanced workflow management.
+4. **📋 Daily Task Board & Priority Matrix**:
+   - Priority badges (`P1 • High`, `P2 • Medium`, `P3 • Low`).
+   - Category tags: `🏃 Running`, `💼 Work`, `💻 Coding`, `📚 Study`, `💪 Fitness`, and `🏠 Personal`.
+   - Day navigator (`< Today >`) to inspect past or future days.
+   - Local JSON backup & restore tool (export/import your data across devices).
 
-4. **📊 Real-time Productivity Analytics**:
-   - Circular daily completion progress ring.
-   - 7-day completion momentum bar chart.
-   - Category distribution percentage tracker.
-   - Productivity health score rating.
-
-5. **🔥 Daily Streak Engine & Day Navigator**:
-   - Easily traverse between days using `< Today >` navigation controls.
-   - Keeps track of consecutive productive execution days.
-
-6. **🎨 Customization & Data Sovereignty**:
+5. **🎨 Modern Glassmorphic Design & Themes**:
    - 3 Curated Themes: **Cosmic Obsidian (Dark)**, **Focus Emerald (Teal)**, and **Clean Paper (Light)**.
-   - Web Audio API synthesizer for clean sound feedback (no external MP3 downloads required).
-   - Local JSON data backup & restore tool (export/import your tasks across any browser).
+   - Web Audio API synthesizer for clean sound feedback.
 
 ---
 
@@ -44,9 +40,9 @@ Designed to streamline task execution with **Time-Blocking**, integrated **Pomod
 
 ```text
 daily-task-tracker/
-├── index.html     # Semantic dashboard structure, modals & view tabs
+├── index.html     # Semantic dashboard structure, 6 AM scheduler, Run Hub & modals
 ├── style.css      # Glassmorphic UI design system, CSS variables & animations
-├── script.js     # State management, Pomodoro timer, audio synth & analytics
+├── script.js     # Direct-write scheduler, running calculator, Pomodoro & state
 └── README.md      # Documentation & deployment guide
 ```
 
@@ -60,15 +56,7 @@ daily-task-tracker/
 
 ---
 
-## 🌐 Deploy to GitHub Pages (Free Hosting)
+## 🌐 Live Website (GitHub Pages)
 
-To make your Daily Task Tracker accessible from your mobile phone or any computer:
-
-1. In this repository (`naikavinash1908-ctrl/DAILY-TASK-TRACKER-`), navigate to:
-   **Settings** > **Pages**
-2. Under **Build and deployment**:
-   - **Source**: `Deploy from a branch`
-   - **Branch**: `main` / Folder: `/(root)`
-3. Click **Save**.
-4. Your tracker will be live at:
-   `https://naikavinash1908-ctrl.github.io/DAILY-TASK-TRACKER-/`
+Access Tracko online:  
+`https://naikavinash1908-ctrl.github.io/DAILY-TASK-TRACKER-/`

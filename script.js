@@ -1,14 +1,15 @@
 /* ========================================================
-   DAILY TASK TRACKER — PRODUCTION APPLICATION LOGIC
-   FULL CRUD, TIME-BLOCKING, POMODORO TIMER, SOUND & ANALYTICS
+   TRACKO — SMART DAILY PLANNER & RUN SUITE
+   DIRECT-WRITE HOURLY SCHEDULE (FROM 6:00 AM) & RUN HUB
    ======================================================== */
 
 (function () {
   'use strict';
 
-  // State keys
-  const STORAGE_KEY = 'daily_task_tracker_data_v1';
-  const SETTINGS_KEY = 'daily_task_tracker_settings_v1';
+  // Storage keys
+  const STORAGE_KEY = 'tracko_task_data_v2';
+  const SETTINGS_KEY = 'tracko_settings_v2';
+  const RUNS_KEY = 'tracko_runs_data_v2';
 
   // Application State
   const AppState = {
@@ -18,10 +19,11 @@
     searchQuery: '',
     soundEnabled: true,
     theme: 'dark',
-    streak: 1,
+    streak: 3,
     tasks: [],
+    runs: [],
     pomodoro: {
-      mode: 'work', // work (25), shortBreak (5), longBreak (15)
+      mode: 'work',
       timeLeft: 25 * 60,
       isRunning: false,
       intervalId: null,
@@ -32,7 +34,7 @@
 
   /* ========================================================
      1. AUDIO SYNTHESIZER (WEB AUDIO API)
-     No external audio files needed!
+     Zero external MP3 dependencies!
      ======================================================== */
   class SoundService {
     constructor() {
@@ -67,9 +69,7 @@
 
         osc.start();
         osc.stop(this.ctx.currentTime + duration);
-      } catch (e) {
-        // Audio might be waiting for user gesture
-      }
+      } catch (e) {}
     }
 
     click() {
@@ -133,7 +133,7 @@
 
     const toast = document.createElement('div');
     toast.className = 'toast';
-    toast.innerHTML = `<span>✓</span> <span>${message}</span>`;
+    toast.innerHTML = `<span>⚡</span> <span>${message}</span>`;
     container.appendChild(toast);
 
     setTimeout(() => {
@@ -166,8 +166,18 @@
         AppState.tasks = [];
       }
     } else {
-      // Seed default productive demo tasks for Today
       seedDefaultTasks();
+    }
+
+    const runsRaw = localStorage.getItem(RUNS_KEY);
+    if (runsRaw) {
+      try {
+        AppState.runs = JSON.parse(runsRaw);
+      } catch (e) {
+        AppState.runs = [];
+      }
+    } else {
+      seedDefaultRuns();
     }
 
     applyTheme(AppState.theme);
@@ -176,6 +186,7 @@
 
   function saveData() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(AppState.tasks));
+    localStorage.setItem(RUNS_KEY, JSON.stringify(AppState.runs));
     localStorage.setItem(
       SETTINGS_KEY,
       JSON.stringify({
@@ -190,59 +201,93 @@
     const today = getTodayString();
     AppState.tasks = [
       {
-        id: 'task_1',
-        title: 'Review Daily Task Tracker UI & Architecture',
+        id: 'task_run_1',
+        title: 'Morning 5 km Run & Mobility Stretch',
+        category: 'Running',
+        priority: 'high',
+        duration: '35',
+        dueTime: '06:00',
+        completed: true,
+        date: today,
+        notes: 'Target pace ~5:45 min/km. Hydrate post-run.'
+      },
+      {
+        id: 'task_code_1',
+        title: 'Review Tracko schedule planner & inline editing',
         category: 'Code',
         priority: 'high',
         duration: '45',
-        dueTime: '09:30',
+        dueTime: '08:00',
         completed: true,
         date: today,
-        notes: 'Ensure responsive breakpoints and Pomodoro timer cycle counts.'
+        notes: 'Verify 6:00 AM start time and direct write inputs.'
       },
       {
-        id: 'task_2',
-        title: 'Deploy to GitHub Pages and verify live telemetry',
+        id: 'task_work_1',
+        title: 'Team standup meeting & task block planning',
         category: 'Work',
-        priority: 'high',
-        duration: '30',
-        dueTime: '11:00',
-        completed: true,
-        date: today,
-        notes: 'Check repository contents and custom domain routing.'
-      },
-      {
-        id: 'task_3',
-        title: '30-minute cardio & strength routine',
-        category: 'Health',
         priority: 'medium',
         duration: '30',
-        dueTime: '16:00',
+        dueTime: '10:00',
         completed: false,
         date: today,
-        notes: 'Hydrate well and stretch post-workout.'
+        notes: 'Review milestones and week targets.'
       },
       {
-        id: 'task_4',
-        title: 'Study JavaScript ES6 state patterns & Web Audio API',
+        id: 'task_study_1',
+        title: 'Study Web Audio API & JavaScript state architecture',
         category: 'Study',
         priority: 'medium',
         duration: '60',
-        dueTime: '14:30',
+        dueTime: '14:00',
         completed: false,
         date: today,
-        notes: 'Review audio oscillator wave shapes (sine vs triangle).'
+        notes: 'Explore oscillator wave shapes.'
       },
       {
-        id: 'task_5',
-        title: 'Plan tomorrow’s priorities & time blocks',
-        category: 'Personal',
+        id: 'task_fit_1',
+        title: 'Core workout & foam rolling recovery',
+        category: 'Health',
         priority: 'low',
-        duration: '15',
-        dueTime: '20:00',
+        duration: '30',
+        dueTime: '18:00',
         completed: false,
         date: today,
-        notes: 'Keep high priority slots in the morning.'
+        notes: 'Planks and stretching.'
+      }
+    ];
+    saveData();
+  }
+
+  function seedDefaultRuns() {
+    const today = getTodayString();
+    AppState.runs = [
+      {
+        id: 'run_1',
+        date: today,
+        distance: 5.0,
+        timeMinutes: 28,
+        pace: '5:36 min/km',
+        calories: 362,
+        notes: 'Morning road run at 6:00 AM. Felt energetic!'
+      },
+      {
+        id: 'run_2',
+        date: 'Yesterday',
+        distance: 4.5,
+        timeMinutes: 26,
+        pace: '5:46 min/km',
+        calories: 325,
+        notes: 'Easy recovery jog.'
+      },
+      {
+        id: 'run_3',
+        date: '2 days ago',
+        distance: 3.0,
+        timeMinutes: 16,
+        pace: '5:20 min/km',
+        calories: 218,
+        notes: 'Interval sprint session.'
       }
     ];
     saveData();
@@ -292,14 +337,341 @@
   }
 
   /* ========================================================
-     5. TASK RENDERING & CRUD
+     5. HOURLY SCHEDULE PLANNER (STARTING 6:00 AM WITH DIRECT WRITE)
+     ======================================================== */
+  function renderHourlySchedule() {
+    const grid = document.getElementById('hourlyTimeline');
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    const dayTasks = AppState.tasks.filter(t => t.date === AppState.selectedDate);
+
+    // SCHEDULE STARTS AT 06:00 AM up to 22:00 (10:00 PM)
+    for (let h = 6; h <= 22; h++) {
+      const hourStr = String(h).padStart(2, '0');
+      const nextHourStr = String(h === 23 ? 0 : h + 1).padStart(2, '0');
+      const displayLabel = `${(h % 12) || 12}:00 ${h >= 12 ? 'PM' : 'AM'}`;
+      const endLabel = `${((h + 1) % 12) || 12}:00 ${h + 1 >= 12 ? 'PM' : 'AM'}`;
+
+      // Tasks assigned to this hour
+      const matching = dayTasks.filter(t => {
+        if (!t.dueTime) return false;
+        const taskHour = t.dueTime.split(':')[0];
+        return taskHour === hourStr;
+      });
+
+      const row = document.createElement('div');
+      row.className = 'hour-row';
+      row.setAttribute('data-hour', hourStr);
+
+      row.innerHTML = `
+        <div class="hour-label">
+          <span>${displayLabel}</span>
+          <span class="hour-subtext">to ${endLabel}</span>
+        </div>
+        <div class="hour-block" id="hourBlock_${hourStr}">
+          ${
+            matching.length > 0
+              ? matching
+                  .map(
+                    m => `
+                <div class="hour-task-chip ${m.completed ? 'completed' : ''}" data-task-id="${m.id}">
+                  <button class="chip-toggle-btn" data-action="toggle-task" data-id="${m.id}" title="Toggle completed">
+                    ${m.completed ? '✓' : ''}
+                  </button>
+                  <span>${getCategoryIcon(m.category)}</span>
+                  <span class="chip-title">${escapeHTML(m.title)}</span>
+                  <button class="chip-del-btn" data-action="del-task" data-id="${m.id}" title="Remove">✕</button>
+                </div>
+              `
+                  )
+                  .join('')
+              : ''
+          }
+          
+          <!-- DIRECT INLINE WRITE INPUT FIELD -->
+          <div class="inline-hour-input-wrap">
+            <input type="text" 
+                   class="inline-hour-input" 
+                   data-hour="${hourStr}" 
+                   placeholder="+ Write activity for ${displayLabel} (Press Enter)..." 
+                   autocomplete="off">
+            <button class="inline-hour-add-btn" data-hour="${hourStr}" title="Add activity to this hour">＋</button>
+          </div>
+        </div>
+      `;
+
+      grid.appendChild(row);
+    }
+
+    // Attach event listeners for inline writing and chips
+    attachHourlyInlineEvents();
+  }
+
+  function attachHourlyInlineEvents() {
+    const grid = document.getElementById('hourlyTimeline');
+    if (!grid) return;
+
+    // Handle Inline Inputs
+    grid.querySelectorAll('.inline-hour-input').forEach(input => {
+      input.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          commitInlineHourTask(input);
+        }
+      });
+    });
+
+    // Handle Inline Add Buttons (＋)
+    grid.querySelectorAll('.inline-hour-add-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const hour = btn.getAttribute('data-hour');
+        const input = grid.querySelector(`.inline-hour-input[data-hour="${hour}"]`);
+        if (input) commitInlineHourTask(input);
+      });
+    });
+
+    // Handle Chip Actions (Check / Delete)
+    grid.querySelectorAll('[data-action="toggle-task"]').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const id = btn.getAttribute('data-id');
+        toggleTaskComplete(id);
+      });
+    });
+
+    grid.querySelectorAll('[data-action="del-task"]').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const id = btn.getAttribute('data-id');
+        deleteTask(id);
+      });
+    });
+  }
+
+  function commitInlineHourTask(input) {
+    const text = input.value.trim();
+    const hour = input.getAttribute('data-hour');
+    if (!text) return;
+
+    // Detect category keywords
+    let cat = 'Work';
+    const lower = text.toLowerCase();
+    if (lower.includes('run') || lower.includes('jog') || lower.includes('sprint') || lower.includes('km')) {
+      cat = 'Running';
+    } else if (lower.includes('gym') || lower.includes('workout') || lower.includes('stretch') || lower.includes('yoga')) {
+      cat = 'Health';
+    } else if (lower.includes('code') || lower.includes('bug') || lower.includes('dev') || lower.includes('deploy')) {
+      cat = 'Code';
+    } else if (lower.includes('read') || lower.includes('study') || lower.includes('learn')) {
+      cat = 'Study';
+    } else if (lower.includes('breakfast') || lower.includes('lunch') || lower.includes('dinner') || lower.includes('groceries')) {
+      cat = 'Personal';
+    }
+
+    addTask(text, cat, 'medium', '60', `${hour}:00`);
+    input.value = '';
+  }
+
+  /* ========================================================
+     6. RUNNING HUB & FITNESS CALCULATOR ENGINE
+     ======================================================== */
+  function initRunningHub() {
+    const distInput = document.getElementById('calcDistanceInput');
+    const timeInput = document.getElementById('calcTimeInput');
+    const weightInput = document.getElementById('calcWeightInput');
+    const terrainSelect = document.getElementById('calcTerrainSelect');
+
+    const resPace = document.getElementById('calcResultPace');
+    const resSpeed = document.getElementById('calcResultSpeed');
+    const resCalories = document.getElementById('calcResultCalories');
+    const resHydration = document.getElementById('calcResultHydration');
+
+    const scheduleBtn = document.getElementById('addRunToScheduleBtn');
+    const goalSelect = document.getElementById('goalPresetSelect');
+    const logBtn = document.getElementById('logRunBtn');
+
+    function updateRunCalculations() {
+      const distance = parseFloat(distInput.value) || 0;
+      const timeMins = parseFloat(timeInput.value) || 0;
+      const weightKg = parseFloat(weightInput.value) || 70;
+      const terrainMult = parseFloat(terrainSelect.value) || 1.0;
+
+      if (distance <= 0 || timeMins <= 0) return;
+
+      // 1. Average Speed (km/h)
+      const hours = timeMins / 60;
+      const speedKmH = distance / hours;
+
+      // 2. Pace (minutes per km)
+      const paceDecimal = timeMins / distance;
+      const paceMins = Math.floor(paceDecimal);
+      const paceSecs = Math.round((paceDecimal - paceMins) * 60);
+      const paceFormatted = `${paceMins}:${String(paceSecs).padStart(2, '0')} min/km`;
+
+      // 3. Calories Burned: Approx Weight(kg) * Distance(km) * 1.036 * Terrain
+      const calories = Math.round(weightKg * distance * 1.036 * terrainMult);
+
+      // 4. Recommended Hydration: ~12 ml per minute of running
+      const hydrationMl = Math.round(timeMins * 12);
+
+      if (resPace) resPace.textContent = paceFormatted;
+      if (resSpeed) resSpeed.textContent = `${speedKmH.toFixed(1)} km/h`;
+      if (resCalories) resCalories.textContent = `~${calories} kcal`;
+      if (resHydration) resHydration.textContent = `${hydrationMl} ml`;
+    }
+
+    [distInput, timeInput, weightInput, terrainSelect].forEach(el => {
+      if (el) el.addEventListener('input', updateRunCalculations);
+    });
+
+    // Schedule This Run at 6:00 AM Today
+    if (scheduleBtn) {
+      scheduleBtn.addEventListener('click', () => {
+        const dist = distInput.value || 5;
+        const mins = timeInput.value || 30;
+        addTask(`Morning Run (${dist} km, ~${mins} mins)`, 'Running', 'high', mins, '06:00');
+        sfx.complete();
+        showToast(`🏃 Run scheduled for 6:00 AM today!`);
+      });
+    }
+
+    // Goal Preset Advisor
+    function updateGoalAdvisor() {
+      if (!goalSelect) return;
+      const val = goalSelect.value;
+      const recTitle = document.getElementById('recTitle');
+      const recDistance = document.getElementById('recDistance');
+      const recDuration = document.getElementById('recDuration');
+      const recFreq = document.getElementById('recFrequency');
+      const recAdvice = document.getElementById('recAdvice');
+
+      switch (val) {
+        case 'fatloss':
+          recTitle.textContent = 'Fat Loss Goal (Burn ~500 kcal)';
+          recDistance.textContent = '6.8 km';
+          recDuration.textContent = '~42-48 mins';
+          recFreq.textContent = '3-4 days / week';
+          recAdvice.textContent = 'Maintain an aerobic Zone 2 conversational pace to optimize fat metabolism without excessive fatigue.';
+          break;
+        case 'endurance':
+          recTitle.textContent = 'Cardiovascular Endurance & Heart Health';
+          recDistance.textContent = '4.0 - 5.0 km';
+          recDuration.textContent = '~25-30 mins';
+          recFreq.textContent = '4-5 days / week';
+          recAdvice.textContent = 'Consistent moderate running improves stroke volume, VO2 max, and lowers resting blood pressure.';
+          break;
+        case '5k':
+          recTitle.textContent = 'First 5K Finisher Preparation';
+          recDistance.textContent = '3.5 - 5.0 km';
+          recDuration.textContent = '~25-35 mins';
+          recFreq.textContent = '3 days / week';
+          recAdvice.textContent = 'Alternate running and walking intervals in week 1-2, building toward continuous 5K running by week 4.';
+          break;
+        case '10k':
+          recTitle.textContent = '10K Race Training & Speed';
+          recDistance.textContent = '8.0 - 10.0 km';
+          recDuration.textContent = '~50-60 mins';
+          recFreq.textContent = '4 days / week';
+          recAdvice.textContent = 'Include one weekly long run, one tempo session, and two easy aerobic recovery runs.';
+          break;
+        case 'stress':
+          recTitle.textContent = 'Mental Clarity & Stress Relief';
+          recDistance.textContent = '3.0 km';
+          recDuration.textContent = '~20 mins';
+          recFreq.textContent = 'Daily / Alternate';
+          recAdvice.textContent = 'Gentle morning jogs at 6:00 AM stimulate endorphins and dopamine to reset focus for the workday.';
+          break;
+      }
+    }
+
+    if (goalSelect) {
+      goalSelect.addEventListener('change', updateGoalAdvisor);
+    }
+
+    // Quick Log Run
+    if (logBtn) {
+      logBtn.addEventListener('click', () => {
+        const km = parseFloat(document.getElementById('quickLogKm').value) || 5;
+        const mins = parseFloat(document.getElementById('quickLogMins').value) || 30;
+
+        const paceDec = mins / km;
+        const pM = Math.floor(paceDec);
+        const pS = Math.round((paceDec - pM) * 60);
+        const paceStr = `${pM}:${String(pS).padStart(2, '0')} min/km`;
+        const cals = Math.round(70 * km * 1.036);
+
+        const newRun = {
+          id: 'run_' + Date.now(),
+          date: AppState.selectedDate,
+          distance: km,
+          timeMinutes: mins,
+          pace: paceStr,
+          calories: cals,
+          notes: 'Logged run session'
+        };
+
+        AppState.runs.unshift(newRun);
+        saveData();
+        sfx.complete();
+        showToast(`🎉 Logged ${km} km run! (${cals} kcal)`);
+        renderRunningHistory();
+      });
+    }
+
+    updateRunCalculations();
+    updateGoalAdvisor();
+    renderRunningHistory();
+  }
+
+  function renderRunningHistory() {
+    const list = document.getElementById('runHistoryList');
+    const weeklyTotalEl = document.getElementById('runWeeklyTotalKm');
+    if (!list) return;
+
+    list.innerHTML = '';
+    let totalKm = 0;
+
+    AppState.runs.forEach(r => {
+      totalKm += parseFloat(r.distance) || 0;
+      const item = document.createElement('div');
+      item.className = 'run-history-item';
+      item.innerHTML = `
+        <div class="run-history-info">
+          <span class="run-icon">🏃</span>
+          <div>
+            <div class="run-title">${r.distance} km Run • ${r.timeMinutes} mins</div>
+            <div class="run-stats">Pace: <strong>${r.pace}</strong> | Burned: <strong>~${r.calories} kcal</strong> | Date: ${r.date}</div>
+          </div>
+        </div>
+        <button class="action-btn delete-btn" data-del-run="${r.id}" title="Remove entry">✕</button>
+      `;
+      list.appendChild(item);
+    });
+
+    if (weeklyTotalEl) {
+      weeklyTotalEl.textContent = totalKm.toFixed(1);
+    }
+
+    list.querySelectorAll('[data-del-run]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-del-run');
+        AppState.runs = AppState.runs.filter(r => r.id !== id);
+        saveData();
+        sfx.click();
+        renderRunningHistory();
+      });
+    });
+  }
+
+  /* ========================================================
+     7. DAILY TASK LIST RENDERING & CRUD
      ======================================================== */
   function renderDailyTasks() {
     const container = document.getElementById('tasksList');
     const emptyState = document.getElementById('emptyState');
     if (!container) return;
 
-    // Filter tasks for current selected date
     let dayTasks = AppState.tasks.filter(t => t.date === AppState.selectedDate);
 
     // Apply Status Filter
@@ -376,8 +748,9 @@
     switch (cat) {
       case 'Work': return '💼';
       case 'Code': return '💻';
-      case 'Study': return '📚';
+      case 'Running': return '🏃';
       case 'Health': return '💪';
+      case 'Study': return '📚';
       case 'Personal': return '🏠';
       default: return '🏷️';
     }
@@ -400,7 +773,7 @@
       category: category || 'Work',
       priority: priority || 'medium',
       duration: duration || '30',
-      dueTime: dueTime || '12:00',
+      dueTime: dueTime || '06:00',
       completed: false,
       date: AppState.selectedDate,
       notes: ''
@@ -438,7 +811,7 @@
   }
 
   /* ========================================================
-     6. SUMMARY & PROGRESS METRICS
+     8. SUMMARY & PROGRESS METRICS
      ======================================================== */
   function updateSummaryCards() {
     const allForDay = AppState.tasks.filter(t => t.date === AppState.selectedDate);
@@ -449,7 +822,6 @@
     const total = allForDay.length;
     const pct = total === 0 ? 0 : Math.round((completed.length / total) * 100);
 
-    // Update Counts
     const totalEl = document.getElementById('totalTasksCount');
     const activeEl = document.getElementById('activeTasksCount');
     const completedEl = document.getElementById('completedTasksCount');
@@ -470,20 +842,18 @@
     if (subEl) subEl.textContent = `${completed.length} of ${total} tasks completed`;
 
     if (headEl) {
-      if (total === 0) headEl.textContent = 'Plan your tasks for today';
+      if (total === 0) headEl.textContent = 'Plan your tasks for today in Tracko';
       else if (pct === 100) headEl.textContent = '🎉 All daily tasks completed!';
       else if (pct >= 50) headEl.textContent = 'Great momentum! More than halfway.';
-      else headEl.textContent = 'Stay focused and conquer your day.';
+      else headEl.textContent = 'Conquer your 6:00 AM to night schedule.';
     }
 
-    // Progress Ring Calculation (Circumference ~ 201 for r=32)
     if (ringEl) {
       const circumference = 2 * Math.PI * 32;
       const offset = circumference - (pct / 100) * circumference;
       ringEl.style.strokeDashoffset = offset;
     }
 
-    // Filter Badges
     const cfAll = document.getElementById('countFilterAll');
     const cfActive = document.getElementById('countFilterActive');
     const cfDone = document.getElementById('countFilterDone');
@@ -493,7 +863,7 @@
   }
 
   /* ========================================================
-     7. POMODORO FOCUS TIMER
+     9. POMODORO FOCUS TIMER
      ======================================================== */
   function initPomodoro() {
     const clock = document.getElementById('timerClock');
@@ -540,7 +910,6 @@
           AppState.pomodoro.timeLeft--;
           updateClockDisplay();
         } else {
-          // Timer finished
           pauseTimer();
           sfx.timerBell();
           AppState.pomodoro.cyclesCompleted++;
@@ -605,75 +974,23 @@
       titleEl.textContent = task.title;
     }
 
-    // Switch to pomodoro tab
     switchTab('pomodoro');
     sfx.click();
     showToast(`Focus target set: "${task.title}"`);
   }
 
   /* ========================================================
-     8. HOURLY SCHEDULE TIMELINE
-     ======================================================== */
-  function renderHourlySchedule() {
-    const grid = document.getElementById('hourlyTimeline');
-    if (!grid) return;
-    grid.innerHTML = '';
-
-    const dayTasks = AppState.tasks.filter(t => t.date === AppState.selectedDate);
-
-    // Hours from 08:00 to 20:00 (8 AM to 8 PM)
-    for (let h = 8; h <= 20; h++) {
-      const hourStr = String(h).padStart(2, '0');
-      const displayLabel = `${(h % 12) || 12}:00 ${h >= 12 ? 'PM' : 'AM'}`;
-
-      // Find tasks assigned to this hour
-      const matching = dayTasks.filter(t => {
-        if (!t.dueTime) return false;
-        const taskHour = t.dueTime.split(':')[0];
-        return taskHour === hourStr;
-      });
-
-      const row = document.createElement('div');
-      row.className = 'hour-row';
-      row.innerHTML = `
-        <div class="hour-label">${displayLabel}</div>
-        <div class="hour-block">
-          ${
-            matching.length > 0
-              ? matching
-                  .map(
-                    m => `
-                <div class="hour-task-chip ${m.completed ? 'completed' : ''}" style="${
-                      m.completed ? 'opacity:0.6;text-decoration:line-through;' : ''
-                    }">
-                  <span>${getCategoryIcon(m.category)}</span>
-                  <span>${escapeHTML(m.title)}</span>
-                </div>
-              `
-                  )
-                  .join('')
-              : '<span style="color:var(--text-muted);font-size:0.78rem;">Free window</span>'
-          }
-        </div>
-      `;
-      grid.appendChild(row);
-    }
-  }
-
-  /* ========================================================
-     9. PRODUCTIVITY ANALYTICS
+     10. PRODUCTIVITY ANALYTICS
      ======================================================== */
   function renderAnalytics() {
     const chartBars = document.getElementById('weeklyChartBars');
     const catBars = document.getElementById('categoryBreakdownBars');
     if (!chartBars || !catBars) return;
 
-    // A. Weekly completion bars
     chartBars.innerHTML = '';
     const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-    // Simulated weekly sample data mapped with current day counts
-    const todayIndex = new Date().getDay(); // 0 is Sun, 1 is Mon...
+    const todayIndex = new Date().getDay();
     const adjustedToday = todayIndex === 0 ? 6 : todayIndex - 1;
 
     daysOfWeek.forEach((day, idx) => {
@@ -695,9 +1012,8 @@
       chartBars.appendChild(barWrap);
     });
 
-    // B. Category Distribution
     catBars.innerHTML = '';
-    const categories = ['Work', 'Code', 'Study', 'Personal', 'Health'];
+    const categories = ['Work', 'Code', 'Running', 'Health', 'Study', 'Personal'];
     const totalTasks = AppState.tasks.length || 1;
 
     categories.forEach(cat => {
@@ -720,7 +1036,7 @@
   }
 
   /* ========================================================
-     10. TAB NAVIGATION & MODALS
+     11. TAB NAVIGATION & MODALS
      ======================================================== */
   function switchTab(tabName) {
     document.querySelectorAll('.tab-btn').forEach(b => {
@@ -797,7 +1113,7 @@
     document.getElementById('editTaskTitle').value = task.title;
     document.getElementById('editTaskCategory').value = task.category;
     document.getElementById('editTaskPriority').value = task.priority;
-    document.getElementById('editTaskDueTime').value = task.dueTime || '12:00';
+    document.getElementById('editTaskDueTime').value = task.dueTime || '06:00';
     document.getElementById('editTaskDuration').value = task.duration || '30';
     document.getElementById('editTaskNotes').value = task.notes || '';
 
@@ -833,22 +1149,25 @@
     if (backdrop) backdrop.addEventListener('click', closeModal);
     if (closeBtn) closeBtn.addEventListener('click', closeModal);
 
-    // Export JSON
     if (exportBtn) {
       exportBtn.addEventListener('click', () => {
-        const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(AppState.tasks, null, 2));
+        const exportPayload = {
+          tasks: AppState.tasks,
+          runs: AppState.runs,
+          streak: AppState.streak
+        };
+        const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(exportPayload, null, 2));
         const dlAnchor = document.createElement('a');
         dlAnchor.setAttribute('href', dataStr);
-        dlAnchor.setAttribute('download', `daily_tasks_backup_${AppState.selectedDate}.json`);
+        dlAnchor.setAttribute('download', `tracko_backup_${AppState.selectedDate}.json`);
         document.body.appendChild(dlAnchor);
         dlAnchor.click();
         dlAnchor.remove();
         sfx.complete();
-        showToast('Backup JSON downloaded successfully!');
+        showToast('Tracko backup downloaded successfully!');
       });
     }
 
-    // Import JSON
     if (importBtn && fileInput) {
       importBtn.addEventListener('click', () => fileInput.click());
       fileInput.addEventListener('change', e => {
@@ -859,11 +1178,20 @@
         reader.onload = ev => {
           try {
             const imported = JSON.parse(ev.target.result);
-            if (Array.isArray(imported)) {
+            if (imported.tasks && Array.isArray(imported.tasks)) {
+              AppState.tasks = imported.tasks;
+              if (imported.runs && Array.isArray(imported.runs)) AppState.runs = imported.runs;
+              saveData();
+              sfx.complete();
+              showToast('Tracko backup restored successfully!');
+              renderDailyTasks();
+              renderRunningHistory();
+              closeModal();
+            } else if (Array.isArray(imported)) {
               AppState.tasks = imported;
               saveData();
               sfx.complete();
-              showToast('Backup restored successfully!');
+              showToast('Tasks restored successfully!');
               renderDailyTasks();
               closeModal();
             } else {
@@ -877,15 +1205,16 @@
       });
     }
 
-    // Reset All
     if (resetBtn) {
       resetBtn.addEventListener('click', () => {
-        if (confirm('Are you sure you want to clear all tasks? This action cannot be undone.')) {
+        if (confirm('Are you sure you want to clear all tasks & runs in Tracko?')) {
           AppState.tasks = [];
+          AppState.runs = [];
           saveData();
           sfx.click();
-          showToast('All tasks cleared.');
+          showToast('Tracko data reset.');
           renderDailyTasks();
+          renderRunningHistory();
           closeModal();
         }
       });
@@ -893,7 +1222,7 @@
   }
 
   /* ========================================================
-     11. DATE NAVIGATOR & EVENT LISTENERS
+     12. DATE NAVIGATOR & EVENT LISTENERS
      ======================================================== */
   function initDateNavigator() {
     const display = document.getElementById('currentDateDisplay');
@@ -940,7 +1269,6 @@
   }
 
   function initEventListeners() {
-    // Quick Add Form
     const addForm = document.getElementById('quickAddForm');
     if (addForm) {
       addForm.addEventListener('submit', e => {
@@ -958,7 +1286,6 @@
       });
     }
 
-    // List event delegation (complete, edit, delete, focus)
     const taskList = document.getElementById('tasksList');
     if (taskList) {
       taskList.addEventListener('click', e => {
@@ -983,7 +1310,6 @@
       });
     }
 
-    // Filter pills
     document.querySelectorAll('.filter-pill').forEach(pill => {
       pill.addEventListener('click', () => {
         document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
@@ -994,7 +1320,6 @@
       });
     });
 
-    // Category filter dropdown
     const catSelect = document.getElementById('categoryFilterSelect');
     if (catSelect) {
       catSelect.addEventListener('change', () => {
@@ -1004,7 +1329,6 @@
       });
     }
 
-    // Search input
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
       searchInput.addEventListener('input', e => {
@@ -1013,7 +1337,6 @@
       });
     }
 
-    // Clear completed button
     const clearCompleted = document.getElementById('clearCompletedBtn');
     if (clearCompleted) {
       clearCompleted.addEventListener('click', () => {
@@ -1030,18 +1353,18 @@
       });
     }
 
-    // Load sample template button
     const sampleBtn = document.getElementById('sampleTasksBtn');
     if (sampleBtn) {
       sampleBtn.addEventListener('click', () => {
         seedDefaultTasks();
+        seedDefaultRuns();
         sfx.complete();
-        showToast('Demo productivity tasks loaded!');
+        showToast('Demo tasks & running logs reloaded in Tracko!');
         renderDailyTasks();
+        renderRunningHistory();
       });
     }
 
-    // Theme & Sound header buttons
     const themeBtn = document.getElementById('themeToggleBtn');
     if (themeBtn) themeBtn.addEventListener('click', toggleTheme);
 
@@ -1050,18 +1373,19 @@
   }
 
   /* ========================================================
-     12. INITIALIZATION
+     13. INITIALIZATION
      ======================================================== */
   document.addEventListener('DOMContentLoaded', () => {
     loadData();
     initDateNavigator();
     initTabs();
     initPomodoro();
+    initRunningHub();
     initEditModal();
     initBackupModal();
     initEventListeners();
     renderDailyTasks();
 
-    console.log('%c🚀 Daily Task Tracker Engine Online | Crafted by Avinash Naik', 'color:#3b82f6;font-weight:bold;');
+    console.log('%c🚀 Tracko Suite Online | Smart Daily Planner & Run Hub | Avinash Naik', 'color:#3b82f6;font-weight:bold;');
   });
 })();

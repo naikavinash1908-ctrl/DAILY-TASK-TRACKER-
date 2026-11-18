@@ -1,6 +1,6 @@
 /* ========================================================
-   DAILY TASK TRACKER — PRODUCTION DESIGN SYSTEM
-   THEMING, GLASSMORPHISM, GRID, TIMELINE & POMODORO
+   TRACKO — SMART DAILY PLANNER & RUN SUITE
+   THEMING, GLASSMORPHISM, HOURLY DIRECT-WRITE & RUN HUB
    ======================================================== */
 
 :root {
@@ -159,8 +159,15 @@ body {
   box-shadow: 0 0 16px var(--accent-glow);
 }
 
+.logo-letter {
+  font-size: 1.5rem;
+  font-weight: 900;
+  font-family: var(--font-main);
+  letter-spacing: -0.05em;
+}
+
 .brand-info h1 {
-  font-size: 1.45rem;
+  font-size: 1.55rem;
   font-weight: 800;
   letter-spacing: -0.02em;
 }
@@ -365,7 +372,7 @@ body {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   color: var(--text-secondary);
-  padding: 9px 18px;
+  padding: 10px 20px;
   border-radius: var(--radius-md);
   font-size: 0.9rem;
   font-weight: 600;
@@ -394,7 +401,439 @@ body {
   display: block;
 }
 
-/* QUICK ADD BOX */
+/* ========================================================
+   HOURLY SCHEDULE TIMELINE (DIRECT-WRITE UI STARTING 6 AM)
+   ======================================================== */
+.schedule-planner-container {
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 26px;
+}
+
+.timeline-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-color);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.timeline-header-text h3 {
+  font-size: 1.25rem;
+  margin-bottom: 4px;
+}
+
+.timeline-header-text p {
+  color: var(--text-muted);
+  font-size: 0.86rem;
+}
+
+.timeline-quick-tip {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  background: rgba(59, 130, 246, 0.08);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px dashed rgba(59, 130, 246, 0.3);
+}
+
+.timeline-quick-tip kbd {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  color: var(--accent);
+}
+
+.hourly-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.hour-row {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.015);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  transition: var(--transition);
+}
+
+.hour-row:hover {
+  background: rgba(255, 255, 255, 0.035);
+  border-color: var(--border-color-hover);
+}
+
+.hour-label {
+  font-family: var(--font-mono);
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+}
+
+.hour-subtext {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-weight: normal;
+}
+
+.hour-block {
+  min-height: 46px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Hourly task chips */
+.hour-task-chip {
+  background: var(--bg-input);
+  border: 1px solid var(--border-color-hover);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: var(--transition);
+}
+
+.hour-task-chip.completed {
+  opacity: 0.6;
+  text-decoration: line-through;
+}
+
+.chip-toggle-btn {
+  background: none;
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+}
+
+.hour-task-chip.completed .chip-toggle-btn {
+  background: var(--success);
+  border-color: var(--success);
+  color: white;
+}
+
+.chip-del-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0 2px;
+  line-height: 1;
+}
+
+.chip-del-btn:hover {
+  color: var(--danger);
+}
+
+/* Direct Inline Write Input */
+.inline-hour-input-wrap {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 220px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+  transition: var(--transition);
+}
+
+.inline-hour-input-wrap:focus-within {
+  border-color: var(--accent);
+  background: var(--bg-input);
+  border-style: solid;
+}
+
+.inline-hour-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 0.84rem;
+  font-family: var(--font-main);
+  outline: none;
+  padding: 2px 4px;
+}
+
+.inline-hour-input::placeholder {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.inline-hour-add-btn {
+  background: var(--accent);
+  border: none;
+  color: white;
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.inline-hour-add-btn:hover {
+  transform: scale(1.08);
+}
+
+/* ========================================================
+   RUNNING HUB & FITNESS CALCULATOR
+   ======================================================== */
+.running-hub-container {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.running-header-card {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(16, 185, 129, 0.08));
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 24px 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+
+.run-badge {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--success);
+  font-size: 0.74rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  display: inline-block;
+  margin-bottom: 8px;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.running-header-left h2 {
+  font-size: 1.35rem;
+  margin-bottom: 4px;
+}
+
+.running-header-left p {
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  max-width: 580px;
+}
+
+.running-weekly-metric {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 14px 20px;
+  text-align: center;
+}
+
+.running-weekly-metric .metric-val {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--success);
+}
+
+.running-weekly-metric .metric-val small {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.running-weekly-metric .metric-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.running-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 22px;
+}
+
+.run-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+}
+
+.run-card-header {
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.run-card-header h3 {
+  font-size: 1.15rem;
+  margin-bottom: 3px;
+}
+
+.sub-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.calc-inputs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.calc-results-box {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 16px;
+}
+
+.calc-result-pill {
+  display: flex;
+  flex-direction: column;
+}
+
+.res-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.res-val {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+}
+
+.goal-advisor-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.goal-recommendation-box {
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 16px;
+}
+
+.rec-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+
+.rec-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.rec-pill {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 8px;
+  text-align: center;
+}
+
+.rec-label {
+  display: block;
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+.rec-val {
+  font-size: 0.88rem;
+  color: var(--text-primary);
+}
+
+.rec-advice {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.quick-run-log-form {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 14px;
+}
+
+.run-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.run-history-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+}
+
+.run-history-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.run-icon {
+  font-size: 1.4rem;
+}
+
+.run-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.run-stats {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* ========================================================
+   DAILY TASKS TAB (CARDS, QUICK ADD, ETC.)
+   ======================================================== */
 .quick-add-box {
   background: var(--bg-card);
   backdrop-filter: blur(16px);
@@ -798,7 +1237,7 @@ body {
   font-size: 0.9rem;
 }
 
-/* TAB 2: POMODORO */
+/* POMODORO */
 .pomodoro-container {
   display: flex;
   justify-content: center;
@@ -902,78 +1341,7 @@ body {
   padding-top: 18px;
 }
 
-/* TAB 3: SCHEDULE PLANNER TIMELINE */
-.schedule-planner-container {
-  background: var(--bg-card);
-  backdrop-filter: blur(16px);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  padding: 26px;
-}
-
-.timeline-header {
-  margin-bottom: 24px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.timeline-header h3 {
-  font-size: 1.25rem;
-  margin-bottom: 4px;
-}
-
-.timeline-header p {
-  color: var(--text-muted);
-  font-size: 0.86rem;
-}
-
-.hourly-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.hour-row {
-  display: grid;
-  grid-template-columns: 85px 1fr;
-  align-items: flex-start;
-  gap: 16px;
-  padding: 10px 0;
-  border-bottom: 1px dashed rgba(255, 255, 255, 0.05);
-}
-
-.hour-label {
-  font-family: var(--font-mono);
-  font-size: 0.82rem;
-  color: var(--text-muted);
-  padding-top: 6px;
-}
-
-.hour-block {
-  min-height: 48px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  padding: 8px 12px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
-}
-
-.hour-task-chip {
-  background: var(--bg-input);
-  border: 1px solid var(--border-color-hover);
-  padding: 4px 10px;
-  border-radius: var(--radius-sm);
-  font-size: 0.82rem;
-  font-weight: 500;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-/* TAB 4: ANALYTICS */
+/* ANALYTICS */
 .analytics-container {
   display: flex;
   flex-direction: column;
@@ -1301,6 +1669,12 @@ body {
 }
 
 /* RESPONSIVE */
+@media (max-width: 900px) {
+  .running-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 768px) {
   .app-header {
     flex-direction: column;
@@ -1333,5 +1707,15 @@ body {
   }
   .timer-time {
     font-size: 3.8rem;
+  }
+  .hour-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .calc-inputs-grid {
+    grid-template-columns: 1fr;
+  }
+  .rec-metrics {
+    grid-template-columns: 1fr;
   }
 }
