@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Daily Task Tracker — Modern productivity app with time-blocking, Pomodoro focus timer, subtasks, and productivity analytics.">
+  <title>Daily Task Tracker | Focus & Productivity Suite</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Ambient Background Glow -->
+  <div class="ambient-glow bg-glow-1"></div>
+  <div class="ambient-glow bg-glow-2"></div>
+
+  <!-- App Wrapper -->
+  <div class="app-layout">
+    
+    <!-- TOP NAVIGATION / HEADER -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="logo-mark">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M9 11l3 3L22 4"/>
+            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+          </svg>
+        </div>
+        <div class="brand-info">
+          <h1>Daily<span>Tracker</span></h1>
+          <p id="currentDateDisplay" class="date-subtitle">Loading date...</p>
+        </div>
+      </div>
+
+      <!-- Quick Day Navigator -->
+      <div class="day-navigation">
+        <button id="prevDayBtn" class="day-nav-btn" title="Previous Day">‹</button>
+        <button id="todayBtn" class="day-today-btn">Today</button>
+        <button id="nextDayBtn" class="day-nav-btn" title="Next Day">›</button>
+      </div>
+
+      <!-- Header Widgets & Controls -->
+      <div class="header-right">
+        <!-- Streak Counter -->
+        <div class="streak-widget" title="Your Current Daily Completion Streak">
+          <span class="streak-flame">🔥</span>
+          <span class="streak-text"><strong id="streakCount">1</strong> Day Streak</span>
+        </div>
+
+        <!-- Audio Toggle -->
+        <button id="soundToggleBtn" class="icon-btn" title="Toggle Sound Feedback">
+          <span id="soundIcon">🔔</span>
+        </button>
+
+        <!-- Theme Toggle -->
+        <button id="themeToggleBtn" class="icon-btn" title="Switch Theme (Dark / Light / Focus Emerald)">
+          <span id="themeIcon">🌓</span>
+        </button>
+
+        <!-- Data Backup / Settings -->
+        <button id="backupModalBtn" class="icon-btn" title="Backup & Export Data">
+          <span>⚙️</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- PRODUCTIVITY SUMMARY BAR -->
+    <section class="summary-card">
+      <div class="summary-left">
+        <div class="progress-ring-container">
+          <svg class="progress-ring" width="76" height="76">
+            <circle class="progress-ring-bg" stroke="rgba(255,255,255,0.08)" stroke-width="6" fill="transparent" r="32" cx="38" cy="38"/>
+            <circle id="progressRingCircle" class="progress-ring-fill" stroke="var(--accent)" stroke-width="6" stroke-dasharray="201" stroke-dashoffset="201" stroke-linecap="round" fill="transparent" r="32" cx="38" cy="38"/>
+          </svg>
+          <span id="progressPercentage" class="progress-percent-label">0%</span>
+        </div>
+        <div class="summary-text-block">
+          <h2 id="progressHeadline">Ready to start your day?</h2>
+          <p id="progressSubline">0 of 0 tasks completed</p>
+        </div>
+      </div>
+
+      <div class="summary-stats-group">
+        <div class="summary-stat-pill">
+          <span class="stat-number" id="totalTasksCount">0</span>
+          <span class="stat-label">Total Scheduled</span>
+        </div>
+        <div class="summary-stat-pill">
+          <span class="stat-number text-accent" id="activeTasksCount">0</span>
+          <span class="stat-label">In Progress</span>
+        </div>
+        <div class="summary-stat-pill">
+          <span class="stat-number text-success" id="completedTasksCount">0</span>
+          <span class="stat-label">Done & Checked</span>
+        </div>
+        <div class="summary-stat-pill">
+          <span class="stat-number text-warning" id="highPriorityCount">0</span>
+          <span class="stat-label">High Priority</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW TABS NAVIGATION -->
+    <nav class="view-tabs">
+      <button class="tab-btn active" data-tab="list">
+        <span class="tab-icon">📋</span>
+        <span>Daily Tasks</span>
+      </button>
+      <button class="tab-btn" data-tab="pomodoro">
+        <span class="tab-icon">⏱️</span>
+        <span>Pomodoro Focus</span>
+      </button>
+      <button class="tab-btn" data-tab="timeline">
+        <span class="tab-icon">📅</span>
+        <span>Schedule Planner</span>
+      </button>
+      <button class="tab-btn" data-tab="analytics">
+        <span class="tab-icon">📊</span>
+        <span>Productivity Stats</span>
+      </button>
+    </nav>
+
+    <!-- TAB 1: DAILY TASK LIST VIEW -->
+    <main class="tab-content active" id="tab-list">
+      
+      <!-- QUICK ADD BAR -->
+      <div class="quick-add-box">
+        <form id="quickAddForm" class="quick-add-form">
+          <div class="input-main-row">
+            <span class="plus-icon">＋</span>
+            <input type="text" id="taskInputText" placeholder="Add a new task for today (e.g. 'Review pull request', 'Study JavaScript', 'Workout')..." autocomplete="off" required>
+            <button type="submit" class="btn btn-primary add-submit-btn">
+              <span>Add Task</span>
+              <kbd class="kbd-hint">Enter</kbd>
+            </button>
+          </div>
+
+          <div class="input-options-row">
+            <!-- Category -->
+            <div class="option-select-wrap">
+              <span class="option-icon">🏷️</span>
+              <select id="taskCategorySelect">
+                <option value="Work">💼 Work</option>
+                <option value="Code">💻 Coding</option>
+                <option value="Study">📚 Study</option>
+                <option value="Personal">🏠 Personal</option>
+                <option value="Health">💪 Health</option>
+              </select>
+            </div>
+
+            <!-- Priority -->
+            <div class="option-select-wrap">
+              <span class="option-icon">⚡</span>
+              <select id="taskPrioritySelect">
+                <option value="high">P1 • High Priority</option>
+                <option value="medium" selected>P2 • Medium</option>
+                <option value="low">P3 • Low</option>
+              </select>
+            </div>
+
+            <!-- Estimated Time -->
+            <div class="option-select-wrap">
+              <span class="option-icon">⏱️</span>
+              <select id="taskDurationSelect">
+                <option value="15">15 mins</option>
+                <option value="30" selected>30 mins</option>
+                <option value="45">45 mins</option>
+                <option value="60">1 hour</option>
+                <option value="90">1.5 hours</option>
+                <option value="120">2 hours</option>
+              </select>
+            </div>
+
+            <!-- Due Time -->
+            <div class="option-select-wrap">
+              <span class="option-icon">⏰</span>
+              <input type="time" id="taskDueTimeInput" value="12:00">
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- FILTER & SEARCH BAR -->
+      <div class="filter-controls-row">
+        <div class="search-box-wrap">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input type="text" id="searchInput" placeholder="Search tasks by title or tag...">
+        </div>
+
+        <div class="filter-pills" id="statusFilterGroup">
+          <button class="filter-pill active" data-status="all">All (<span id="countFilterAll">0</span>)</button>
+          <button class="filter-pill" data-status="active">Pending (<span id="countFilterActive">0</span>)</button>
+          <button class="filter-pill" data-status="completed">Done (<span id="countFilterDone">0</span>)</button>
+          <button class="filter-pill" data-status="high">High Priority</button>
+        </div>
+
+        <div class="category-dropdown-wrap">
+          <select id="categoryFilterSelect" class="clean-select">
+            <option value="all">All Categories</option>
+            <option value="Work">💼 Work</option>
+            <option value="Code">💻 Coding</option>
+            <option value="Study">📚 Study</option>
+            <option value="Personal">🏠 Personal</option>
+            <option value="Health">💪 Health</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- TASK CARDS CONTAINER -->
+      <div class="tasks-list" id="tasksList">
+        <!-- Rendered dynamically via JavaScript -->
+      </div>
+
+      <!-- EMPTY STATE TEMPLATE -->
+      <div class="empty-state" id="emptyState" style="display: none;">
+        <div class="empty-icon">🎯</div>
+        <h3>No tasks found for today</h3>
+        <p>Type a task in the box above to schedule your day and build your streak!</p>
+      </div>
+
+    </main>
+
+    <!-- TAB 2: POMODORO FOCUS STATION -->
+    <section class="tab-content" id="tab-pomodoro">
+      <div class="pomodoro-container">
+        <div class="pomodoro-card">
+          <div class="pomodoro-modes">
+            <button class="pomo-mode-btn active" data-mode="work">Focus (25m)</button>
+            <button class="pomo-mode-btn" data-mode="shortBreak">Short Break (5m)</button>
+            <button class="pomo-mode-btn" data-mode="longBreak">Long Break (15m)</button>
+          </div>
+
+          <div class="timer-display-wrap">
+            <div class="timer-time" id="timerClock">25:00</div>
+            <div class="timer-status-text" id="timerStatusLabel">Stay focused on your active objective</div>
+          </div>
+
+          <!-- Active Linked Task Pill -->
+          <div class="active-focus-task-pill" id="activeFocusPill">
+            <span class="active-badge">ACTIVE TARGET</span>
+            <span id="activeFocusTaskTitle">Select a task from your daily list</span>
+          </div>
+
+          <!-- Controls -->
+          <div class="timer-controls">
+            <button id="timerToggleBtn" class="btn btn-primary btn-large btn-timer">
+              <span id="timerBtnIcon">▶</span>
+              <span id="timerBtnText">Start Focus</span>
+            </button>
+            <button id="timerResetBtn" class="btn btn-outline btn-timer" title="Reset Timer">
+              <span>↺ Reset</span>
+            </button>
+          </div>
+
+          <div class="pomo-cycle-counter">
+            <span>Completed Today: <strong id="pomoCyclesCount">0</strong> cycles (0 mins focused)</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: HOURLY SCHEDULE PLANNER -->
+    <section class="tab-content" id="tab-timeline">
+      <div class="schedule-planner-container">
+        <div class="timeline-header">
+          <h3>Daily Hourly Time-Block Schedule</h3>
+          <p>Organize your day hour-by-hour to balance deep work, meetings, and recovery.</p>
+        </div>
+        
+        <div class="hourly-grid" id="hourlyTimeline">
+          <!-- Populated dynamically (8:00 AM to 9:00 PM) -->
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: PRODUCTIVITY ANALYTICS -->
+    <section class="tab-content" id="tab-analytics">
+      <div class="analytics-container">
+        <div class="analytics-header">
+          <h3>Weekly Productivity & Momentum Analysis</h3>
+          <p>Review your execution trends, category allocation, and consistency score.</p>
+        </div>
+
+        <div class="analytics-grid">
+          <!-- Weekly Activity Chart -->
+          <div class="analytics-card">
+            <h4>Weekly Completion Trend</h4>
+            <div class="chart-bars" id="weeklyChartBars">
+              <!-- Dynamically populated -->
+            </div>
+            <div class="chart-legend">
+              <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+            </div>
+          </div>
+
+          <!-- Category Breakdown -->
+          <div class="analytics-card">
+            <h4>Category Distribution</h4>
+            <div class="category-bars-list" id="categoryBreakdownBars">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- Productivity Insights Card -->
+          <div class="analytics-card full-width">
+            <h4>Productivity Health Score</h4>
+            <div class="insight-row">
+              <div class="insight-badge" id="insightScoreBadge">A+</div>
+              <div>
+                <strong id="insightHeadline">Peak Efficiency</strong>
+                <p id="insightDesc">You have an outstanding completion consistency. Maintaining your daily streak boosts long-term momentum.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="app-footer">
+      <div class="footer-left">
+        <span>© 2026 Daily Task Tracker • Crafted by <strong>Avinash Naik</strong></span>
+      </div>
+      <div class="footer-right">
+        <button id="clearCompletedBtn" class="footer-btn">Clear Completed</button>
+        <button id="sampleTasksBtn" class="footer-btn">Load Demo Template</button>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- ========================================================
+       MODAL: EDIT TASK & CHECKLIST
+       ======================================================== -->
+  <div class="modal-wrap" id="taskEditModal">
+    <div class="modal-backdrop" id="editModalBackdrop"></div>
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Edit Task Details</h3>
+        <button class="modal-close" id="closeEditModalBtn">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <form id="editTaskForm">
+          <input type="hidden" id="editTaskId">
+          <div class="form-group">
+            <label>Task Title</label>
+            <input type="text" id="editTaskTitle" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Category</label>
+              <select id="editTaskCategory">
+                <option value="Work">💼 Work</option>
+                <option value="Code">💻 Coding</option>
+                <option value="Study">📚 Study</option>
+                <option value="Personal">🏠 Personal</option>
+                <option value="Health">💪 Health</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Priority</label>
+              <select id="editTaskPriority">
+                <option value="high">P1 • High</option>
+                <option value="medium">P2 • Medium</option>
+                <option value="low">P3 • Low</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Scheduled Due Time</label>
+              <input type="time" id="editTaskDueTime">
+            </div>
+            <div class="form-group">
+              <label>Estimated Duration</label>
+              <select id="editTaskDuration">
+                <option value="15">15 mins</option>
+                <option value="30">30 mins</option>
+                <option value="45">45 mins</option>
+                <option value="60">1 hour</option>
+                <option value="90">1.5 hours</option>
+                <option value="120">2 hours</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Notes / Subtasks -->
+          <div class="form-group">
+            <label>Notes & Checklist Items</label>
+            <textarea id="editTaskNotes" rows="3" placeholder="Add specific sub-goals, checklist bullets, or notes..."></textarea>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" id="deleteTaskModalBtn" class="btn btn-danger">Delete Task</button>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       MODAL: DATA BACKUP, EXPORT & SETTINGS
+       ======================================================== -->
+  <div class="modal-wrap" id="backupModal">
+    <div class="modal-backdrop" id="backupModalBackdrop"></div>
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Backup & Data Management</h3>
+        <button class="modal-close" id="closeBackupModalBtn">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:16px;">
+          All your daily tasks and streak data are stored locally in your browser. You can export a JSON backup to transfer between devices.
+        </p>
+
+        <div class="backup-actions-grid">
+          <div class="backup-card">
+            <h4>Export Data</h4>
+            <p>Download your complete task history and streaks as a portable JSON file.</p>
+            <button id="exportJsonBtn" class="btn btn-outline btn-full">📥 Export JSON Backup</button>
+          </div>
+
+          <div class="backup-card">
+            <h4>Import Data</h4>
+            <p>Restore tasks from a previously saved JSON file.</p>
+            <input type="file" id="importJsonFileInput" accept=".json" style="display:none;">
+            <button id="importJsonBtn" class="btn btn-outline btn-full">📤 Import Backup</button>
+          </div>
+        </div>
+
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border-color);display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:0.85rem;color:var(--danger);">Clear all local tasks</span>
+          <button id="resetAllDataBtn" class="btn btn-danger btn-sm">Reset Everything</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- App Script -->
+  <script src="script.js"></script>
+</body>
+</html>
